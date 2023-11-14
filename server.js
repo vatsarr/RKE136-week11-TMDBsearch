@@ -13,21 +13,38 @@ app.get("/search", (req, res) => {
 
 app.post("/search", (req, res) => {
   let apiKey = "95ad7d4eb26fc0b6ce1566fce9ac0b48";
-  let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=Free+Guy&`;
+  let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=Oppenheimer`;
   let genresUrl = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en`;
 
   let endpoints = [movieUrl, genresUrl];
 
   axios.all(endpoints.map((endpoint) => axios.get(endpoint))).then(
     axios.spread((movie, genres) => {
-      console.log(movie.data.results[0]);
-
       const movieRaw = movie.data.results[0];
+      const allMovieGenres = genres.data.genres;
+      let movieGenresIds = movieRaw.genre_ids;
+
+      let movieGenresArray = [];
+
+      for (i = 0; i < movieGenresIds.length; i++) {
+        for (j = 0; j < allMovieGenres.length; j++) {
+          if (movieGenresIds[i] === allMovieGenres[j].id) {
+            movieGenresArray.push(allMovieGenres[j].name);
+          }
+        }
+      }
+
+      let genresToDisplay = "";
+      movieGenresArray.forEach((genre) => {
+        genresToDisplay = genresToDisplay + `${genre}, `;
+      });
+
+      genresToDisplay = genresToDisplay.slice(0, -2);
 
       let movieData = {
         title: movieRaw.title,
         year: new Date(movieRaw.release_date).getFullYear(),
-        genres: "",
+        genres: genresToDisplay,
         overview: movieRaw.overview,
         posterUrl: `https://image.tmdb.org/t/p/w500${movieRaw.poster_path}`,
       };
