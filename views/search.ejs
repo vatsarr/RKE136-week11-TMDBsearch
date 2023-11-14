@@ -15,6 +15,7 @@
             name="movieTitle"
             id=""
             placeholder="Enter movie title"
+            required
           />
           <button type="submit">Search</button>
         </form>
@@ -24,14 +25,17 @@
 
       <div class="result-container">
         <ul class="movie-data-list">
-          <li><span>Title: </span><%= movieDetails.title %></li>
-          <li><span>Year: </span><%= movieDetails.year %></li>
-          <li><span>Genres: </span><%= movieDetails.genres %></li>
-          <li><span>Overview: </span><%= movieDetails.overview %></li>
+          <li><%= movieDetails.title %></li>
+          <li class="movie-year">(<%= movieDetails.year %>)</li>
+          <li class="movie-genres"><%= movieDetails.genres %></li>
         </ul>
         <div class="image-container">
           <img src="<%= movieDetails.posterUrl %>" alt="" />
         </div>
+        <ul class="movie-overview-container">
+          <li>Overview</li>
+          <p><%= movieDetails.overview %></p>
+        </ul>
       </div>
       <% } %>
     </div>

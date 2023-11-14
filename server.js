@@ -1,11 +1,13 @@
 const axios = require("axios");
 const express = require("express");
+const regex = /^[a-zA-Z0-9 !@#$%^&*)(]{2,40}$/;
 
 const app = express();
 const port = 3000;
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/search", (req, res) => {
   res.render("search", { movieDetails: "" });
@@ -13,45 +15,49 @@ app.get("/search", (req, res) => {
 
 app.post("/search", (req, res) => {
   let apiKey = "95ad7d4eb26fc0b6ce1566fce9ac0b48";
-  let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=Oppenheimer`;
+  let userMovieInput = req.body.movieTitle;
+
+  let movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${userMovieInput}`;
   let genresUrl = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en`;
 
   let endpoints = [movieUrl, genresUrl];
 
-  axios.all(endpoints.map((endpoint) => axios.get(endpoint))).then(
-    axios.spread((movie, genres) => {
-      const movieRaw = movie.data.results[0];
-      const allMovieGenres = genres.data.genres;
-      let movieGenresIds = movieRaw.genre_ids;
+  if (userMovieInput && regex.test(userMovieInput)) {
+    axios.all(endpoints.map((endpoint) => axios.get(endpoint))).then(
+      axios.spread((movie, genres) => {
+        const movieRaw = movie.data.results[0];
+        const allMovieGenres = genres.data.genres;
+        let movieGenresIds = movieRaw.genre_ids;
 
-      let movieGenresArray = [];
+        let movieGenresArray = [];
 
-      for (i = 0; i < movieGenresIds.length; i++) {
-        for (j = 0; j < allMovieGenres.length; j++) {
-          if (movieGenresIds[i] === allMovieGenres[j].id) {
-            movieGenresArray.push(allMovieGenres[j].name);
+        for (i = 0; i < movieGenresIds.length; i++) {
+          for (j = 0; j < allMovieGenres.length; j++) {
+            if (movieGenresIds[i] === allMovieGenres[j].id) {
+              movieGenresArray.push(allMovieGenres[j].name);
+            }
           }
         }
-      }
 
-      let genresToDisplay = "";
-      movieGenresArray.forEach((genre) => {
-        genresToDisplay = genresToDisplay + `${genre}, `;
-      });
+        let genresToDisplay = "";
+        movieGenresArray.forEach((genre) => {
+          genresToDisplay = genresToDisplay + `${genre}, `;
+        });
 
-      genresToDisplay = genresToDisplay.slice(0, -2);
+        genresToDisplay = genresToDisplay.slice(0, -2);
 
-      let movieData = {
-        title: movieRaw.title,
-        year: new Date(movieRaw.release_date).getFullYear(),
-        genres: genresToDisplay,
-        overview: movieRaw.overview,
-        posterUrl: `https://image.tmdb.org/t/p/w500${movieRaw.poster_path}`,
-      };
+        let movieData = {
+          title: movieRaw.title,
+          year: new Date(movieRaw.release_date).getFullYear(),
+          genres: genresToDisplay,
+          overview: movieRaw.overview,
+          posterUrl: `https://image.tmdb.org/t/p/w500${movieRaw.poster_path}`,
+        };
 
-      res.render("search", { movieDetails: movieData });
-    })
-  );
+        res.render("search", { movieDetails: movieData });
+      })
+    );
+  }
 });
 
 app.listen(process.env.PORT || port, () => {
