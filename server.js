@@ -52,6 +52,7 @@ app.post("/search", (req, res) => {
           genres: genresToDisplay,
           overview: movieRaw.overview,
           posterUrl: `https://image.tmdb.org/t/p/w500${movieRaw.poster_path}`,
+          rating: movieRaw.vote_average.toFixed(1),
         };
 
         res.render("search", { movieDetails: movieData });

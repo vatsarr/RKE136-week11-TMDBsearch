@@ -26,7 +26,10 @@
       <div class="result-container">
         <ul class="movie-data-list">
           <li><%= movieDetails.title %></li>
-          <li class="movie-year">(<%= movieDetails.year %>)</li>
+          <li class="movie-year">
+            <span>(<%= movieDetails.year %>)</span> &#8226
+            <span><%= movieDetails.rating%></span> / 10
+          </li>
           <li class="movie-genres"><%= movieDetails.genres %></li>
         </ul>
         <div class="image-container">
