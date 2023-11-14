@@ -42,6 +42,10 @@
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
+.form-container button:hover {
+  transform: scale(1.05);
+}
+
 .form-container button:active {
   transform: scale(0.95);
   background-color: #458845;
@@ -74,6 +78,11 @@
   width: 450px;
   border-radius: 10px;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.result-container img:hover {
+  cursor: pointer;
+  transform: scale(1.01);
 }
 
 .movie-overview-container {
